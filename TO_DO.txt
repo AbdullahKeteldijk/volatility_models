@@ -1,0 +1,9 @@
+- Add more models
+- Change the theta variable to a dictionary with the actual names of the variables
+- Add more distributions
+- Change the GARCH models so they can dynamically account for more lagged terms
+- Change the way in which the bounds are chosen
+- Experiment with other optimiation algorithms
+- Implement GAS models
+
+- Implement Kalman Filter for structural break detection

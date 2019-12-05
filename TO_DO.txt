@@ -1,5 +1,7 @@
+- Add docstrings and README.MD
 - Add more models
-- Change the theta variable to a dictionary with the actual names of the variables
+- Change the theta variable to a dictionary with the actual names of 
+  the variables
 - Add more distributions
 - Change the GARCH models so they can dynamically account for more lagged terms
 - Change the way in which the bounds are chosen
@@ -7,3 +9,9 @@
 - Implement GAS models
 
 - Implement Kalman Filter for structural break detection
+
+* NOTE: Some of the other distributions have parameters that 
+	also have to be optimized. These parameters should also 
+	be included in the variable dictionary.
+
+

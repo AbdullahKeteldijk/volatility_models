@@ -6,108 +6,81 @@ class ARCH():
 
     name = 'ARCH'
 
-    def __init__(self, p=1, theta=None, stationary=True, maxiter=500,
-                 method='BFGS', bounds=None):
+    def __init__(self, p=1, theta=None, stationary=True, maxiter=500, distribution='Normal',
+                 method='L-BFGS-B', bounds=((0,1),(0,1))):
 
         self.p = p
         self.stationary = stationary
         self.maxiter = maxiter
         self.method = method
         self.bounds = bounds
+        self.distribution = distribution
+        self.params = 2
 
         if theta is None:
-            self.theta = np.ones((1, self.p+1)).flatten()
+            self.theta = np.ones((self.params)) * 0.1
         else:
-            # assert len(theta) == p
             self.theta = theta
-
 
         return None
 
 
-    def get_lags(self, y):
+    def get_sigma(self, theta, eps):
 
-        len_lag = len(y)-self.p
-        lags = np.ones((len_lag, self.p))
+        sigma = np.zeros((len(eps), 1))
+        sigma[0] = np.var(eps)
 
-        for i in range(self.p):
-            if i != 0:
-                lags[:,i] = y[i:-self.p+i]
-
-        return lags
-
-
-    def get_sigma(self, data):
-        # sigma = omega + alpha*x(t)^2 + beta*sigma(t);
-
-        print('1:', np.ones((len(data),1)).shape)
-        print('2:', np.power(data,2).shape)
-        print('3:', data)
-
-        model_data = np.concatenate((np.ones((len(data),1)), np.power(data,2).reshape(len(data),1)), axis=1)
-        sigma = np.sum(np.multiply(self.theta, model_data), axis=0)
+        for i in range(1, len(eps)):
+            sigma[i] = theta[0] + theta[1] * np.power(eps[i-1], 2)
 
         return sigma
 
 
-    # def loglikelihood(self, X):
-    #     # l = -(1 / 2) * log(2 * pi) - (1 / 2) * log(sig(1:T)) - (1 / 2) * (x').^2./sig(1:T);
-    #
-    #     # sigma = self.get_sigma(X)
-    #     #
-    #     # llik = -(1/2) * np.log(2 * np.pi) - (1/2) * np.log(sigma) - (1/2) * np.divide(np.power(X,2), sigma)
-    #
-    #
-    #
-    #     return llik
+    def loglikelihood(self, theta, eps):
 
-    def sigmoid(self, X, beta):
-        z = np.dot(X, beta)
-        return 1 / (1 + np.exp(-z))
+        sigma = self.get_sigma(theta, eps)
 
-    def loglikelihood(self, beta, X):
+        if self.distribution == 'Normal':
+            llik = -(1 / 2) * np.log(2 * np.pi) - (1 / 2) * np.log(sigma) - (1 / 2) * np.divide(np.power(eps, 2), sigma)
+        # elif self.distribution == 'Student-t':
+        #     llik = np.log(theta)
 
-        y = 0.5
-        m = len(X)
-        h = self.sigmoid(X, beta)
+        return np.mean(-llik)
 
-        J = -(1 / m) * np.sum(y * np.log(h) + (1 - y) * np.log(1 - h))
-
-        llik = -(1 / 2) * np.log(2 * np.pi) - (1 / 2) * np.log(h) - (1 / 2) * np.divide(np.power(X, 2), h)
-
-        return llik
-
-    def optimizer(self, theta, X):
+    def optimizer(self, theta, eps):
 
         opt = minimize(fun=self.loglikelihood,
                             x0=theta,
                             method=self.method,
-                            args=(X,),
+                            args=(eps,),
                             bounds=self.bounds,
-                            options={'maxiter':self.maxiter}
+                            options={'maxiter':self.maxiter},
                             )
-
         return opt
 
     def fit(self, y):
 
-        X = self.get_lags(y)
-        self.X = np.concatenate([np.ones((len(X),1)), X], axis=1)
-        # print(X.shape)
+        self.n = len(y)
+        self.m = len(self.theta)
 
-        print(self.theta)
-        self.opt = self.optimizer(self.theta, self.X)
+        self.eps = y.reshape((len(y),1))
+        self.opt = self.optimizer(self.theta, self.eps)
 
+        print(self.opt)
+        self.llik = self.opt.fun
         self.theta_hat = self.opt.x
 
-        return self.theta_hat
+        self.se = np.diagonal(self.opt.hess_inv.todense())
+        self.z_values = np.divide(self.theta_hat, self.se)
+
+        self.AIC = 2 * self.m - 2 * np.log(self.llik)
+        self.BIC = np.log(self.n) * self.m - 2 * np.log(self.llik)
+
+        return None
+
+    def forecast(self, y):
+
+        return self.get_sigma(self.theta_hat, y)
 
 
-df = pd.read_csv('../data/BTC-USD.csv')
 
-close_diff = df['Close'].diff().values
-
-model = ARCH()
-model.fit(close_diff)
-
-print(model.theta_hat)

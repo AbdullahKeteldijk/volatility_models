@@ -3,14 +3,25 @@ from scipy.optimize import minimize
 import pandas as pd
 
 class ARCH():
+    '''
+    Base class for the Autoregressive Conditional Heteroskedasticy model.
+    '''
 
     name = 'ARCH'
 
-    def __init__(self, p=1, theta=None, stationary=True, maxiter=500, distribution='Normal',
+    def __init__(self, p=1, theta=None, maxiter=500, distribution='Normal',
                  method='L-BFGS-B', bounds=((0,1),(0,1))):
+        '''
 
+        :param p: int - Number of lag periods
+        :param theta: list - Parameters that have to be optimized
+        :param maxiter: Maximum number of iterations of the optimizers
+        :param distribution: string - Name of probability distribution
+        :param method: string - Name of Scipy minimize optimization algorithm
+        :param bounds: tuple - Tuple of tuples with lower and upper bound of the theta parameters
+        '''
+        
         self.p = p
-        self.stationary = stationary
         self.maxiter = maxiter
         self.method = method
         self.bounds = bounds
@@ -26,6 +37,12 @@ class ARCH():
 
 
     def get_sigma(self, theta, eps):
+        '''
+        Base sigma function
+        :param theta: Parameters that have to be optimized
+        :param eps: input vector with I(0) data
+        :return: sigma: estimated volatility
+        '''
 
         sigma = np.zeros((len(eps), 1))
         sigma[0] = np.var(eps)
@@ -37,6 +54,12 @@ class ARCH():
 
 
     def loglikelihood(self, theta, eps):
+        '''
+        The loglikelihood is the cost function for the algorithm. We can implement multiple probability distributions.
+        :param theta: Parameters that have to be optimized
+        :param eps: input vector with I(0) data
+        :return: llik: loglikelihood value
+        '''
 
         sigma = self.get_sigma(theta, eps)
 
@@ -48,7 +71,12 @@ class ARCH():
         return np.mean(-llik)
 
     def optimizer(self, theta, eps):
-
+        '''
+        Minimize function from Scipy.
+        :param theta: Parameters that have to be optimized
+        :param eps: input vector with I(0) data
+        :return: opt: Scipy optimize object
+        '''
         opt = minimize(fun=self.loglikelihood,
                             x0=theta,
                             method=self.method,
@@ -59,7 +87,11 @@ class ARCH():
         return opt
 
     def fit(self, y):
-
+        '''
+        Fitting the model to the data.
+        :param y: input vector with I(0) data
+        :return: None
+        '''
         self.n = len(y)
         self.m = len(self.theta)
 
@@ -79,7 +111,11 @@ class ARCH():
         return None
 
     def forecast(self, y):
-
+        '''
+        Forecast function
+        :param y: input vector with I(0) data
+        :return: prediction based on trained model
+        '''
         return self.get_sigma(self.theta_hat, y)
 
 

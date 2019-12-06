@@ -4,7 +4,10 @@ import numpy as np
 class GARCH(ARCH):
 
     def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1))):
-
+        '''
+        Inherits the init function of the base class.
+        :param theta: Parameters that have to be optimized
+        '''
         super().__init__(self)
         self.params = 3
 
@@ -18,7 +21,12 @@ class GARCH(ARCH):
         self.bounds = bounds
 
     def get_sigma(self, theta, eps):
-
+        '''
+        Base sigma function
+        :param theta: Parameters that have to be optimized
+        :param eps: input vector with I(0) data
+        :return: sigma: estimated volatility
+        '''
         sigma = np.zeros((len(eps), 1))
         sigma[0] = np.var(eps)
 
@@ -30,7 +38,10 @@ class GARCH(ARCH):
 class ZD_GARCH(ARCH):
 
     def __init__(self, theta=None):
-
+        '''
+        Inherits the init function of the base class.
+        :param theta: Parameters that have to be optimized
+        '''
         super().__init__(self)
         self.params = 2
         if theta is None:
@@ -42,7 +53,12 @@ class ZD_GARCH(ARCH):
 
 
     def get_sigma(self, theta, eps):
-
+        '''
+        Base sigma function
+        :param theta: Parameters that have to be optimized
+        :param eps: input vector with I(0) data
+        :return: sigma: estimated volatility
+        '''
         sigma = np.zeros((len(eps), 1))
         sigma[0] = np.var(eps)
 
@@ -54,7 +70,10 @@ class ZD_GARCH(ARCH):
 class EGARCH(ARCH):
 
     def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1),(0,1))):
-
+        '''
+        Inherits the init function of the base class.
+        :param theta: Parameters that have to be optimized
+        '''
         super().__init__(self)
         self.params = 4
         if theta is None:
@@ -68,7 +87,12 @@ class EGARCH(ARCH):
         self.bounds = bounds
 
     def get_sigma(self, theta, eps):
-
+        '''
+        Base sigma function
+        :param theta: Parameters that have to be optimized
+        :param eps: input vector with I(0) data
+        :return: sigma: estimated volatility
+        '''
         sigma = np.zeros((len(eps), 1))
         sigma[0] = np.var(eps)
 
@@ -83,7 +107,10 @@ class EGARCH(ARCH):
 class SE_GARCH(ARCH):
 
     def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1))):
-
+        '''
+        Inherits the init function of the base class.
+        :param theta: Parameters that have to be optimized
+        '''
         super().__init__(self)
         self.params = 3
 
@@ -97,7 +124,12 @@ class SE_GARCH(ARCH):
         self.bounds = bounds
 
     def get_sigma(self, theta, eps):
-
+        '''
+        Base sigma function
+        :param theta: Parameters that have to be optimized
+        :param eps: input vector with I(0) data
+        :return: sigma: estimated volatility
+        '''
         sigma = np.zeros((len(eps), 1))
         sigma[0] = np.var(eps)
 
@@ -109,7 +141,10 @@ class SE_GARCH(ARCH):
 class NGARCH(ARCH):
 
     def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1),(0,1))):
-
+        '''
+        Inherits the init function of the base class.
+        :param theta: Parameters that have to be optimized
+        '''
         super().__init__(self)
         self.params = 4
 
@@ -125,7 +160,12 @@ class NGARCH(ARCH):
         self.bounds = bounds
 
     def get_sigma(self, theta, eps):
-
+        '''
+        Base sigma function
+        :param theta: Parameters that have to be optimized
+        :param eps: input vector with I(0) data
+        :return: sigma: estimated volatility
+        '''
         sigma = np.zeros((len(eps), 1))
         sigma[0] = np.var(eps)
 

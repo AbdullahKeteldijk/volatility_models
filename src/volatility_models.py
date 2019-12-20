@@ -10,7 +10,7 @@ class ARCH():
     name = 'ARCH'
 
     def __init__(self, p=1, theta=None, maxiter=500, distribution='Normal',
-                 method='L-BFGS-B', bounds=((0,1),(0,1))):
+                 method='L-BFGS-B', bounds=None):
         '''
 
         :param p: int - Number of lag periods
@@ -20,21 +20,27 @@ class ARCH():
         :param method: string - Name of Scipy minimize optimization algorithm
         :param bounds: tuple - Tuple of tuples with lower and upper bound of the theta parameters
         '''
-        
+
         self.p = p
         self.maxiter = maxiter
         self.method = method
         self.bounds = bounds
         self.distribution = distribution
-        self.params = 2
-
-        if theta is None:
-            self.theta = np.ones((self.params)) * 0.1
-        else:
-            self.theta = theta
+        self.theta = theta
 
         return None
 
+
+    def gen_eps_mat(self, eps):
+        eps = eps.reshape((len(eps),))
+        eps_mat = np.zeros((len(eps)-self.p*2, self.p))
+
+        for i in range(self.p):
+            start = self.p + i
+            stop = len(eps) - self.p + i
+            eps_mat[:,i] = eps[start:stop]
+
+        return eps_mat
 
     def get_sigma(self, theta, eps):
         '''
@@ -44,11 +50,11 @@ class ARCH():
         :return: sigma: estimated volatility
         '''
 
-        sigma = np.zeros((len(eps), 1))
-        sigma[0] = np.var(eps)
+        eps_mat = self.gen_eps_mat(eps)
 
-        for i in range(1, len(eps)):
-            sigma[i] = theta[0] + theta[1] * np.power(eps[i-1], 2)
+        const = np.ones((len(eps_mat), 1))
+        summation = np.multiply(theta[1:], eps_mat)
+        sigma = np.sum(np.concatenate((const, summation), axis=1), axis=1)
 
         return sigma
 

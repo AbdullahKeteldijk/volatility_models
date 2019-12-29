@@ -3,13 +3,16 @@ import numpy as np
 
 class GARCH(ARCH):
 
-    def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1))):
+    def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1)), p=1, q=1):
         '''
         Inherits the init function of the base class.
         :param theta: Parameters that have to be optimized
         '''
         super().__init__(self)
         self.params = 3
+
+        self.p = p
+        self.q = q
 
         if theta is None:
             self.theta = np.ones((self.params))
@@ -27,11 +30,28 @@ class GARCH(ARCH):
         :param eps: input vector with I(0) data
         :return: sigma: estimated volatility
         '''
-        sigma = np.zeros((len(eps), 1))
-        sigma[0] = np.var(eps)
+        # print('test1', theta)
+        # print('test2', self.theta)
+        # print('test3', self.p)
+        eps_mat = self.gen_eps_mat(eps)
+        const = np.ones((len(eps_mat), 1))
+        eps_mat_sum = np.sum(np.multiply(theta[1:self.p+1], eps_mat), axis=1)
 
-        for i in range(1, len(eps)):
-            sigma[i] = theta[0] + theta[1] * np.power(eps[i-1], 2) + theta[2]*sigma[i-1]
+        sigma = np.zeros((len(eps), 1))
+        lags = max([self.p, self.q])
+        sigma[:lags] = np.var(eps)
+
+        for i in range(lags, len(sigma)+1):
+            sigma_lag = sigma[i:lags+i]
+            sigma_vec_sum = np.sum(np.multiply(theta[self.p:self.p+self.q+1], sigma_lag))
+
+            # print(sigma[i].shape)
+            # print(theta.shape)
+            # print(theta[0])
+            # print(eps_mat_sum[i])
+            # print(sigma_vec_sum)
+
+            sigma[i] = theta[0] + eps_mat_sum[i] + sigma_vec_sum
 
         return sigma
 

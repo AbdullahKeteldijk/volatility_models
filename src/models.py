@@ -3,16 +3,17 @@ import numpy as np
 
 class GARCH(ARCH):
 
-    def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1)), p=1, q=1):
+    def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1)), p=1, q=1, **kwds):
         '''
         Inherits the init function of the base class.
         :param theta: Parameters that have to be optimized
         '''
-        super().__init__(self)
+        super().__init__(self, **kwds)
         self.params = 3
 
         self.p = p
         self.q = q
+        # self.method = method
 
         if theta is None:
             self.theta = np.ones((self.params))
@@ -46,20 +47,26 @@ class GARCH(ARCH):
         # print('sigma', sigma.shape)
 
         for i in range(lags, len(sigma)):
-            sigma_lag = sigma[i-lags:i+lags]
+            sigma_lag = sigma[i-lags:i]
 
-            sigma_vec_sum = np.sum(np.multiply(theta[self.p+1:self.p+self.q+1], sigma_lag))
+            # print('theta:', theta[self.p+1:self.p+self.q+1])
+            # print('sigma_lag:', sigma_lag[0])
+            # print('multi:', np.multiply(theta[self.p+1:self.p+self.q+1], sigma_lag[0]))
+
+            sigma_vec_sum = np.sum(np.multiply(theta[self.p+1:self.p+self.q+1], sigma_lag[0]))
 
             # print(sigma[i].shape)
             # print(theta.shape)
-            print(theta[0], eps_mat_sum[i-lags*2], sigma_vec_sum)
+
             # print(eps_mat_sum[i-lags*2])
             # print(sigma_vec_sum)
 
             sigma[i] = theta[0] + eps_mat_sum[i-lags*2] + sigma_vec_sum
-            print('sigma', sigma)
-
-        print(sigma[:5], sigma[-5:])
+        #     print(sigma[i], theta, eps_mat_sum[i-lags*2], sigma_vec_sum)
+        #
+        # print(theta)
+        #
+        # print(sigma[:5], sigma[-5:])
         return sigma
 
 class ZD_GARCH(ARCH):

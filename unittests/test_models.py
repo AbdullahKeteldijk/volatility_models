@@ -13,6 +13,9 @@ import arch.data.sp500
 
 class MyTestCase(unittest.TestCase):
 
+
+
+
     def test_ARCH(self):
         st = dt.datetime(1988, 1, 1)
         en = dt.datetime(2018, 1, 1)
@@ -36,16 +39,20 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(True, True)
 
     def test_GARCH(self):
-        st = dt.datetime(1988, 1, 1)
-        en = dt.datetime(2018, 1, 1)
-        data = arch.data.sp500.load()
+        # st = dt.datetime(1988, 1, 1)
+        # en = dt.datetime(2018, 1, 1)
+        # data = arch.data.sp500.load()
+        data = pd.read_csv('../data/input/AAPL.csv')
         market = data['Adj Close']
-        returns = 100 * market.pct_change().dropna().values
+        returns = market.pct_change().dropna().values
+        # plt.plot(returns)
+        # plt.show()
 
-        theta = np.array([0.1, 0.1, 0.1, 0.8, 0.5])
-        bounds = ((0,1), (0,1), (0,1), (0,1), (0,1))
+        theta = np.array([0.05, 0.1, 0.9])
+        bounds = ((0.00001, 10), (0.00001, 10), (0.00001, 10))
 
-        model = GARCH(theta=theta, bounds=bounds, p=2, q=2)
+        model = GARCH(theta=theta, bounds=bounds, p=1, q=1)
+        print(model.method)
         model.fit(returns)
         forecasts = model.forecast(returns)
 
@@ -64,8 +71,8 @@ class MyTestCase(unittest.TestCase):
         market = data['Adj Close']
         returns = 100 * market.pct_change().dropna().values
 
-        theta = np.array([0.1, 0.1, 0.8])
-        bounds = ((0, 1), (0, 1), (0, 1))
+        theta = np.array([0.2, 0.3, 0.6])
+        bounds = ((0.00001, 100), (0, 1), (0, 1))
 
         model = SE_GARCH(theta, bounds)
         model.fit(returns)

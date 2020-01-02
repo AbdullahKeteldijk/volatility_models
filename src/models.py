@@ -41,18 +41,25 @@ class GARCH(ARCH):
         lags = max([self.p, self.q])
         sigma[:lags] = np.var(eps)
 
-        for i in range(lags, len(sigma)+1):
-            sigma_lag = sigma[i:lags+i]
-            sigma_vec_sum = np.sum(np.multiply(theta[self.p:self.p+self.q+1], sigma_lag))
+        #
+        # print('eps', eps_mat_sum.shape)
+        # print('sigma', sigma.shape)
+
+        for i in range(lags, len(sigma)):
+            sigma_lag = sigma[i-lags:i+lags]
+
+            sigma_vec_sum = np.sum(np.multiply(theta[self.p+1:self.p+self.q+1], sigma_lag))
 
             # print(sigma[i].shape)
             # print(theta.shape)
-            # print(theta[0])
-            # print(eps_mat_sum[i])
+            print(theta[0], eps_mat_sum[i-lags*2], sigma_vec_sum)
+            # print(eps_mat_sum[i-lags*2])
             # print(sigma_vec_sum)
 
-            sigma[i] = theta[0] + eps_mat_sum[i] + sigma_vec_sum
+            sigma[i] = theta[0] + eps_mat_sum[i-lags*2] + sigma_vec_sum
+            print('sigma', sigma)
 
+        print(sigma[:5], sigma[-5:])
         return sigma
 
 class ZD_GARCH(ARCH):

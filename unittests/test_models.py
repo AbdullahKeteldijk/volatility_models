@@ -1,5 +1,6 @@
 import unittest
-from src.models import GARCH, SE_GARCH, NGARCH, EGARCH, ZD_GARCH
+from src.volatility_models import GARCH
+from src.models import ARCH, SE_GARCH, NGARCH, EGARCH, ZD_GARCH
 
 import numpy as np
 import pandas as pd
@@ -8,7 +9,7 @@ import matplotlib.pyplot as plt
 import datetime as dt
 import arch.data.sp500
 
-from src.volatility_models import ARCH
+# from src.volatility_models import GARCH
 
 class MyTestCase(unittest.TestCase):
 
@@ -21,7 +22,26 @@ class MyTestCase(unittest.TestCase):
         market = data['Adj Close']
         returns = 100 * market.pct_change().dropna().values
 
-        model = GARCH()
+        model = GARCH(distribution='Normal')
+        model.fit(returns)
+        forecasts = model.forecast(returns)
+
+        plt.plot(returns, label='returns')
+        plt.plot(forecasts, label='GARCH')
+        plt.title('Volatility Forecast S&P 500')
+        plt.legend()
+        plt.savefig('../data/output/GARCH.png')
+
+        self.assertEqual(True, True)
+
+    def test_GARCH_s(self):
+        st = dt.datetime(1988, 1, 1)
+        en = dt.datetime(2018, 1, 1)
+        data = arch.data.sp500.load()
+        market = data['Adj Close']
+        returns = 100 * market.pct_change().dropna().values
+
+        model = GARCH(distribution='Student-t')
         model.fit(returns)
         forecasts = model.forecast(returns)
 

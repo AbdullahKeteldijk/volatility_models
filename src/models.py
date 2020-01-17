@@ -1,9 +1,9 @@
-from src.volatility_models import ARCH
+from src.volatility_models import GARCH
 import numpy as np
 
-class GARCH(ARCH):
+class ARCH(GARCH):
 
-    def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1))):
+    def __init__(self, theta=None, bounds=((0,1),(0,1))):
         '''
         Inherits the init function of the base class.
         :param theta: Parameters that have to be optimized

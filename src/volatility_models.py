@@ -1,16 +1,17 @@
 import numpy as np
 from scipy.optimize import minimize
 import pandas as pd
+from math import gamma
 
-class ARCH():
+class GARCH():
     '''
     Base class for the Autoregressive Conditional Heteroskedasticy model.
     '''
 
-    name = 'ARCH'
+    name = 'GARCH'
 
     def __init__(self, p=1, theta=None, maxiter=500, distribution='Normal',
-                 method='L-BFGS-B', bounds=((0,1),(0,1))):
+                 method='L-BFGS-B', bounds=((0,1),(0,1),(0,1)), dof=3):
         '''
 
         :param p: int - Number of lag periods
@@ -27,14 +28,24 @@ class ARCH():
         self.bounds = bounds
         self.distribution = distribution
         self.params = 2
+        self.dof = dof
 
         if theta is None:
             self.theta = np.ones((self.params)) * 0.1
         else:
             self.theta = theta
 
-        return None
 
+        self.params = 3
+
+        if theta is None:
+            self.theta = np.ones((self.params))
+            self.theta[:2] = self.theta[:2] * 0.1
+            self.theta[2] = self.theta[2] * 0.8
+        else:
+            self.theta = theta
+
+        self.bounds = bounds
 
     def get_sigma(self, theta, eps):
         '''
@@ -43,12 +54,11 @@ class ARCH():
         :param eps: input vector with I(0) data
         :return: sigma: estimated volatility
         '''
-
         sigma = np.zeros((len(eps), 1))
         sigma[0] = np.var(eps)
 
         for i in range(1, len(eps)):
-            sigma[i] = theta[0] + theta[1] * np.power(eps[i-1], 2)
+            sigma[i] = theta[0] + theta[1] * np.power(eps[i-1], 2) + theta[2]*sigma[i-1]
 
         return sigma
 
@@ -65,8 +75,14 @@ class ARCH():
 
         if self.distribution == 'Normal':
             llik = -(1 / 2) * np.log(2 * np.pi) - (1 / 2) * np.log(sigma) - (1 / 2) * np.divide(np.power(eps, 2), sigma)
-        # elif self.distribution == 'Student-t':
-        #     llik = np.log(theta)
+
+        elif self.distribution == 'Student-t':
+
+            nu = self.dof
+
+            llik = np.log(gamma(nu+1)/2) - np.log(gamma(nu/2)) \
+                   - 0.5 * np.log((nu-2)*np.pi*sigma) \
+                   - ((nu+1)/2)*np.log(1+(np.divide(np.power(eps,2),(nu-2)*sigma)))
 
         return np.mean(-llik)
 

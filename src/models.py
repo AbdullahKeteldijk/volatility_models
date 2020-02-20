@@ -67,15 +67,16 @@ class ZD_GARCH(ARCH):
 
         return sigma
 
-class EGARCH(ARCH):
+class EGARCH(GARCH):
 
-    def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1),(0,1))):
+    def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1),(0,1)), distribution='Normal'):
         '''
         Inherits the init function of the base class.
         :param theta: Parameters that have to be optimized
         '''
         super().__init__(self)
         self.params = 4
+        self.distribution = distribution
         if theta is None:
             self.theta = np.ones((self.params))
             self.theta[:2] = self.theta[:2] * 0.1
@@ -104,7 +105,7 @@ class EGARCH(ARCH):
 
         return sigma
 
-class SE_GARCH(ARCH):
+class SE_GARCH(GARCH):
 
     def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1))):
         '''
@@ -138,15 +139,16 @@ class SE_GARCH(ARCH):
 
         return sigma
 
-class NGARCH(ARCH):
+class NGARCH(GARCH):
 
-    def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1),(0,1))):
+    def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1),(0,1)), distribution='Normal'):
         '''
         Inherits the init function of the base class.
         :param theta: Parameters that have to be optimized
         '''
         super().__init__(self)
         self.params = 4
+        self.distribution = distribution
 
         if theta is None:
             self.theta = np.ones((self.params))

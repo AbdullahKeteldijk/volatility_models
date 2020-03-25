@@ -8,7 +8,6 @@
 import pandas as pd
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
-
 from src.volatility_models import GARCH
 
 # import log returns
@@ -33,4 +32,24 @@ se = garch.se
 z_values = garch.z_values
 MSE = mean_squared_error(out_sample, prediction)
 MAE = mean_absolute_error(out_sample, prediction)
+```
+
+Hyperparameters can be added to the GARCH model:
+```
+distribution = "Normal"
+theta_init = [0.2, 0.1, 0.7]
+bounds = [(0,0.9), (0,1), (0.001,1)]
+maxiter = 200
+method = "L-BFGS-B"
+
+garch = GARCH(distribution=distribution,theta=theta_init, 
+              bounds=bounds, maxiter=maxiter, method=method
+              )
+```
+
+Other models can be added by simply importing them in the same manner e.g. :
+```
+from src.volatility_models import EGARCH
+
+egarch = EGARCH()
 ```

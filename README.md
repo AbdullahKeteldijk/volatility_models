@@ -4,7 +4,7 @@
 
 2. Import the models as follows
 
-`
+```
 import pandas as pd
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
@@ -33,4 +33,4 @@ se = garch.se
 z_values = garch.z_values
 MSE = mean_squared_error(out_sample, prediction)
 MAE = mean_absolute_error(out_sample, prediction)
-`
+```

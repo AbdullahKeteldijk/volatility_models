@@ -118,7 +118,7 @@ class GARCH():
         self.llik = self.opt.fun
         self.theta_hat = self.opt.x
 
-        self.se = np.diagonal(self.opt.hess_inv.todense())
+        self.se = np.sqrt(np.diagonal(self.opt.hess_inv.todense()))
         self.z_values = np.divide(self.theta_hat, self.se)
 
         self.AIC = 2 * self.m - 2 * np.log(self.llik)

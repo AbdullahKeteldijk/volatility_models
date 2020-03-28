@@ -35,7 +35,7 @@ class ARCH(GARCH):
 
         return sigma
 
-class ZD_GARCH(ARCH):
+class ZD_GARCH(GARCH):
 
     def __init__(self, theta=None):
         '''
@@ -67,7 +67,7 @@ class ZD_GARCH(ARCH):
 
         return sigma
 
-class EGARCH(ARCH):
+class EGARCH(GARCH):
 
     def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1),(0,1))):
         '''
@@ -104,7 +104,7 @@ class EGARCH(ARCH):
 
         return sigma
 
-class SE_GARCH(ARCH):
+class SE_GARCH(GARCH):
 
     def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1))):
         '''
@@ -138,7 +138,7 @@ class SE_GARCH(ARCH):
 
         return sigma
 
-class NGARCH(ARCH):
+class NGARCH(GARCH):
 
     def __init__(self, theta=None, bounds=((0,1),(0,1),(0,1),(0,1))):
         '''

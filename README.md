@@ -1,4 +1,4 @@
-# How to run file
+# How to run the code
 
 1. Create new folder in the root directory called project
 
